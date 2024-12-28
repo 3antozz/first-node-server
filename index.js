@@ -1,41 +1,26 @@
-const http = require('http');
-const fs = require('fs');
+const express = require("express");
+const app = express();
 
-http.createServer((req, res) => {
-    if (req.url === '/') {
-        fs.readFile('./index.html', (err, data) => {
-            if (err) {
-                return displayError(res)
-            }
-            res.writeHead(200, {'Content-Type': 'text/html'});
-            res.write(data);
-            return res.end();
-        })
-    }
-    else if (req.url === '/about' || req.url === '/contact-me') {
-        const fileName = `./${req.url}.html`;
-        fs.readFile(fileName, (err, data) => {
-            if (err) {
-                return displayError(res);
-            }
-            res.writeHead(200, {'Content-Type': 'text/html'});
-            res.write(data);
-            return res.end();
-        })
-    } else {
-        return displayError(res);
-    }
-}).listen(8080);
+app.get("/", (req, res) => {
+    res.status(200).sendFile("./index.html", { root: "./" }, (err) =>
+        console.log(err)
+    );
+});
+app.get("/about", (req, res) => {
+    res.status(200).sendFile("./about.html", { root: "./" }, (err) =>
+        console.log(err)
+    );
+});
+app.get("/contact-me", (req, res) => {
+    res.status(200).sendFile("./contact-me.html", { root: "./" }, (err) =>
+        console.log(err)
+    );
+});
 
+app.get("*", (req, res) => {
+    res.status(200).sendFile("./404.html", { root: "./" }, (err) =>
+        console.log(err)
+    );
+});
 
-function displayError (res) {
-    fs.readFile('./404.html', (err, data) => {
-        if (err) {
-            res.writeHead(404, {'Content-Type': 'text/html'});
-            return res.end('404 NOT FOUND!')
-        }
-        res.writeHead(200, {'Content-Type': 'text/html'});
-        res.write(data);
-        res.end();
-    })
-}
+app.listen(3000);
